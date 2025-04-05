@@ -1,4 +1,3 @@
-
 # Параметры подключения к локальной базе данных
 local_db_config = {
     'user': 'postgres',
@@ -25,4 +24,13 @@ server_db_config = {
     'host': 'localhost',
     'port': '5432',
     'database': 'stroikin'
+}
+
+
+ugkorea_inside_config = {
+    "user": "postgres",
+    "password": "785612",
+    "host": "192.168.1.88",
+    "port": "5432",
+    "database": "stroikin",
 }
