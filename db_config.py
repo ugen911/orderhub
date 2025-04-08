@@ -1,8 +1,8 @@
 import os
 import platform
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
-load_dotenv()  # Загружаем переменные из .env
+load_dotenv(dotenv_path=find_dotenv(), override=True)
 
 
 def ping(host):
