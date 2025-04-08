@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Карточка товара: {{ data.naimenovanie }}</h2>
+
+    <!-- Основная информация -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Общие сведения</h5>
+            <p><strong>Код:</strong> {{ data.kod }}</p>
+            <p><strong>Артикул:</strong> {{ data.artikul }}</p>
+            <p><strong>Производитель:</strong> {{ data.proizvoditel }}</p>
+            <p><strong>Ед. изм.:</strong> {{ data.edizm }}</p>
+            <p><strong>Стеллаж:</strong> {{ data.stellazh }}</p>
+            <p><strong>Пометка на удаление:</strong>
+                {% if data.pometkaudalenija %}
+                <span class="badge bg-danger">ДА</span>
+                {% else %}
+                <span class="badge bg-success">НЕТ</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Цены и остатки -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Цены</h5>
+                    <p>Закуп: {{ data.tsenazakup }}</p>
+                    <p>Розница: {{ data.tsenarozn }}</p>
+                    <p>Средняя: {{ data.middleprice }}</p>
+                    <p>Максимальная: {{ data.maxprice }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Остатки</h5>
+                    <p>Основной склад: {{ data.osnsklad }}</p>
+                    <p>Склад заказов: {{ data.zakazy_sklad }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Поставщик</h5>
+                    <p>Склад: {{ data.delivery_sklad }}</p>
+                    <p>Остаток: {{ data.delivery_stock }}</p>
+                    <p>Цена: {{ data.delivery_price }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Статистика по месяцам -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Статистика за 36 месяцев</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Месяц</th>
+                            <th>Продажи</th>
+                            <th>Сумма продаж</th>
+                            <th>Остаток</th>
+                            <th>Цена</th>
+                            <th>Поставки</th>
+                            <th>Сумма поставок</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for month, stats in data.monthly_stats.items() %}
+                        <tr>
+                            <td>{{ month }}</td>
+                            <td>{{ stats.sales }}</td>
+                            <td>{{ stats.salesum }}</td>
+                            <td>{{ stats.stock }}</td>
+                            <td>{{ stats.tsena }}</td>
+                            <td>{{ stats.sup }}</td>
+                            <td>{{ stats.supsum }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Аналоги -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Аналоги</h5>
+            <div class="row">
+                {% for analog in data.analogs %}
+                <div class="col-md-4">
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6>{{ analog.naimenovanie }}</h6>
+                            <p>Код: {{ analog.kod }}<br>Артикул: {{ analog.artikul }}<br>Цена: {{ analog.tsenarozn }}
+                            </p>
+                            <a href="/nomenklatura/{{ analog.kod }}/view"
+                                class="btn btn-sm btn-outline-primary">Перейти</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Заказы -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">История заказов</h5>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Артикул</th>
+                        <th>Ед.</th>
+                        <th>Закуп</th>
+                        <th>Кол-во</th>
+                        <th>Сумма</th>
+                        <th>Статус</th>
+                        <th>Розница</th>
+                        <th>Наценка</th>
+                        <th>Примечание</th>
+                        <th>Поставщик</th>
+                        <th>Склад</th>
+                        <th>Оплата</th>
+                        <th>Счет №</th>
+                        <th>Дата счета</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in data.orders %}
+                    <tr>
+                        <td>{{ order.data_prinatia_zakaza }}</td>
+                        <td>{{ order.artikul }}</td>
+                        <td>{{ order.edinicy_izmerenia }}</td>
+                        <td>{{ order.zakup }}</td>
+                        <td>{{ order.kolicestvo }}</td>
+                        <td>{{ order.summa }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.roznica }}</td>
+                        <td>{{ order.nacenka }}</td>
+                        <td>{{ order.primecanie }}</td>
+                        <td>{{ order.postavsik }}</td>
+                        <td>{{ order.sklad }}</td>
+                        <td>{{ order.oplata }}</td>
+                        <td>{{ order.schet_no }}</td>
+                        <td>{{ order.data_sceta }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
