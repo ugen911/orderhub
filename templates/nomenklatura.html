@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
 <style>
     .state-button {
-        padding: 6px 10px;
+        padding: 6px 12px;
         border: none;
         border-radius: 6px;
         font-weight: bold;
         color: white;
         margin: 4px 6px 4px 0;
-        white-space: nowrap;
     }
 
     .state-true {
@@ -19,54 +20,42 @@
         background-color: #6c757d;
     }
 
-    .highlight-price {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-
     .minibox {
-        background-color: #f8f9fa;
-        padding: 10px 14px;
-        border-radius: 6px;
-        margin-bottom: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        height: 100%;
     }
 
     .section-title {
         margin-top: 2rem;
-        margin-bottom: 1rem;
         font-weight: bold;
-    }
-
-    .search-controls {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .search-controls input {
-        width: 180px;
     }
 </style>
 
-<div class="container-fluid p-3 p-md-4">
-
-    <!-- 🔍 Панель управления -->
-    <div class="search-controls mb-3">
-        <form action="/nomenklatura/search" method="get" class="d-flex flex-wrap gap-2">
+<div class="container-fluid p-3">
+    <form action="/nomenklatura/search" method="get" class="row g-2 align-items-center mb-3">
+        <div class="col-auto">
             <input type="text" name="kod" class="form-control form-control-sm" placeholder="Поиск по коду">
+        </div>
+        <div class="col-auto">
             <input type="text" name="artikul" class="form-control form-control-sm" placeholder="Поиск по артикулу">
-            <button type="submit" class="btn btn-sm btn-primary">Найти</button>
-            <a href="/nomenklatura/{{ data.kod }}/prev" class="btn btn-sm btn-outline-secondary">← Назад</a>
-            <a href="/nomenklatura/{{ data.kod }}/next" class="btn btn-sm btn-outline-secondary">Вперед →</a>
-            <a href="/nomenklatura/{{ data.kod }}/view" class="btn btn-sm btn-outline-success">Обновить 🔄</a>
-        </form>
-    </div>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-sm btn-primary"><i class="bi bi-search"></i> Найти</button>
+        </div>
+        <div class="col-auto">
+            <a href="/nomenklatura/{{ data.kod }}/prev" class="btn btn-sm btn-outline-secondary"><i
+                    class="bi bi-arrow-left"></i></a>
+            <a href="/nomenklatura/{{ data.kod }}/next" class="btn btn-sm btn-outline-secondary"><i
+                    class="bi bi-arrow-right"></i></a>
+            <a href="/nomenklatura/{{ data.kod }}/view" class="btn btn-sm btn-outline-success"><i
+                    class="bi bi-arrow-clockwise"></i></a>
+        </div>
+    </form>
 
-    <!-- 🔘 Состояния -->
     <div class="mb-3 d-flex flex-wrap">
         {% for flag, label in [
         ('ne_ispolzuetsya_v_zakaze', 'НЕ ИСПОЛЬЗУЕТСЯ В ЗАКАЗЕ'),
@@ -86,61 +75,74 @@
         {% endfor %}
     </div>
 
-    <!-- 📌 Основной блок -->
-    <div class="row g-3">
-        <div class="col-12 col-lg-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        <div class="col">
             <div class="minibox">
-                <h5><strong>Код:</strong> {{ data.kod }}</h5>
+                <h6><i class="bi bi-upc"></i> Код: {{ data.kod }}</h6>
                 <p><strong>Артикул:</strong> {{ data.artikul }}</p>
                 <p><strong>Производитель:</strong> {{ data.proizvoditel }}</p>
                 <p><strong>Тип детали:</strong> {{ data.type_detail }}</p>
-                <p><strong>Наименование:</strong><br>{{ data.naimenovanie }}</p>
+                <p><strong>Наименование:</strong> {{ data.naimenovanie }}</p>
             </div>
         </div>
 
-        <div class="col-12 col-lg-4">
+        <div class="col">
             <div class="minibox">
-                <p class="highlight-price">Розничная цена: {{ data.tsenarozn|float|round|int }}₽</p>
+                <h6><i class="bi bi-currency-ruble"></i> Цены</h6>
+                <p>Розничная: <strong>{{ data.tsenarozn|float|round|int }}₽</strong></p>
                 <p>Закуп: {{ data.tsenazakup|float|round|int }}₽</p>
                 <p>Средняя: {{ data.middleprice|float|round|int }}₽</p>
                 <p>Максимальная: {{ data.maxprice|float|round|int }}₽</p>
             </div>
+        </div>
+
+        <div class="col">
             <div class="minibox">
+                <h6><i class="bi bi-box"></i> Остатки</h6>
                 <p>Основной склад: {{ data.osnsklad|float|round|int }} {{ data.edizm }}</p>
                 <p>Склад заказов: {{ data.zakazy_sklad|float|round|int }}</p>
                 <p>Стеллаж: {{ data.stellazh }}</p>
             </div>
         </div>
 
-        <div class="col-12 col-lg-4">
+        <div class="col">
             <div class="minibox">
-                <p><strong>Склад поставщика:</strong> {{ data.delivery_sklad }}</p>
+                <h6><i class="bi bi-truck"></i> Поставщик</h6>
+                <p>Склад: {{ data.delivery_sklad }}</p>
                 <p>Остаток: {{ data.delivery_stock|float|round|int }}</p>
                 <p>Цена: {{ data.delivery_price|float|round|int }}₽</p>
             </div>
+        </div>
+
+        <div class="col">
             <div class="minibox">
-                <label for="minimal"><strong>Минимальный остаток:</strong></label>
+                <h6><i class="bi bi-arrow-down-up"></i> Минимум</h6>
+                <label for="minimal">Минимальный остаток:</label>
                 <input type="number" step="1" name="minimal" id="minimal"
                     class="form-control form-control-sm autosave-field" data-kod="{{ data.kod }}"
                     value="{{ data.minimal|float|round|int }}">
-                <p class="mt-2 mb-0">Расчетный минимальный остаток: {{ data.minimal_raschet|float|round|int }}</p>
+                <p class="mt-2">Расчетный: {{ data.minimal_raschet|float|round|int }}</p>
             </div>
+        </div>
+
+        <div class="col">
             <div class="minibox">
-                <p><strong>ABC:</strong> {{ data.abc }}</p>
-                <p><strong>XYZ:</strong> {{ data.xyz }}</p>
+                <h6><i class="bi bi-graph-up"></i> ABC / XYZ</h6>
+                <p>ABC: {{ data.abc }}</p>
+                <p>XYZ: {{ data.xyz }}</p>
                 <p>Продано за год: {{ data.total_sales_last_12_months|float|round|int }}</p>
                 <p>Продано за 3 мес: {{ data.total_sales_last_3_months|float|round|int }}</p>
             </div>
         </div>
     </div>
 
-    <h5 class="section-title">Статистика по месяцам</h5>
+    <h5 class="section-title">📊 Статистика по месяцам</h5>
     {% include "blocks/statistics.html" %}
 
-    <h5 class="section-title">Аналоги</h5>
+    <h5 class="section-title">🔁 Аналоги</h5>
     {% include "blocks/analogs.html" %}
 
-    <h5 class="section-title">История заказов</h5>
+    <h5 class="section-title">🧾 История заказов</h5>
     <div style="max-height: 400px; overflow-y: auto;">
         {% include "blocks/orders.html" %}
     </div>
@@ -154,19 +156,12 @@
                 const kod = field.dataset.kod;
                 const name = field.name;
                 const value = field.value;
-
                 fetch(`/nomenklatura/${kod}/update_field`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
                     body: `field=${encodeURIComponent(name)}&value=${encodeURIComponent(value)}`
-                }).then(res => res.json()).then(data => {
-                    if (data.error) {
-                        console.warn("Ошибка:", data.error);
-                    } else {
-                        console.log(`Сохранено: ${data.field} = ${data.value}`);
-                    }
                 });
             });
         });
