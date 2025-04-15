@@ -1,14 +1,18 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from db_connection import get_db_engine
 from sqlalchemy import text
-from nomenklatura_service import get_nomenklatura_full
+from db_connection import get_db_engine
+from nomenklatura.routes import router as nomenklatura_router
+from nomenklatura.service import get_nomenklatura_full
 
 app = FastAPI()
 
-# 📁 Путь к папке с шаблонами
+# 📁 Путь к шаблонам
 templates = Jinja2Templates(directory="templates")
+
+# 🔌 Подключение роутов
+app.include_router(nomenklatura_router)
 
 
 @app.get("/")
@@ -24,14 +28,6 @@ def get_nomenklatura():
             result = conn.execute(text("SELECT * FROM nomenklatura LIMIT 5"))
             rows = [dict(row._mapping) for row in result]
         return {"data": rows}
-    except Exception as e:
-        return {"error": str(e)}
-
-
-@app.get("/nomenklatura/{kod}")
-def get_nomenklatura_detail(kod: str):
-    try:
-        return get_nomenklatura_full(kod)
     except Exception as e:
         return {"error": str(e)}
 
