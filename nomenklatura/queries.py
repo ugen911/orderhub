@@ -1,18 +1,21 @@
 MAIN_QUERY = """
 SELECT TRIM(n.kod) AS kod, n.artikul, n.proizvoditel, n.edizm, n.stellazh,
        n.naimenovanie, n.pometkaudalenija, fs.gruppa_analogov, fs.type_detail,
-       fs.abc, fs.xyz, fs.total_sales_last_12_months, fs.total_sales_last_3_months, fs.min_stock,
+       fs.abc, fs.xyz, fs.total_sales_last_12_months, fs.total_sales_last_3_months, fs.min_stock AS minimal_raschet,
        p.tsenazakup, p.tsenarozn, mp.middleprice, mp.maxprice,
-       s.osnsklad, s.zakazy_sklad, d.stock AS delivery_stock, d.price AS delivery_price, d.sklad AS delivery_sklad
+       s.osnsklad, s.zakazy_sklad, d.stock AS delivery_stock, d.price AS delivery_price, d.sklad AS delivery_sklad,
+       a.ne_ispolzuetsya_v_zakaze, a.nelikvid, a.zafiksirovat_minimalki, a.list_ozhidaniya, a.minimal
 FROM nomenklaturaold n
 LEFT JOIN full_statistic fs ON TRIM(n.kod) = TRIM(fs.kod)
 LEFT JOIN priceold p ON TRIM(n.kod) = TRIM(p.kod)
 LEFT JOIN middlemaxprice mp ON TRIM(n.kod) = TRIM(mp.kod)
 LEFT JOIN stockold s ON TRIM(n.kod) = TRIM(s.kod)
 LEFT JOIN deliveryminprice d ON TRIM(n.kod) = TRIM(d.kod)
+LEFT JOIN accessdata a ON TRIM(n.kod) = TRIM(a.kod)
 WHERE TRIM(n.kod) = :kod
 LIMIT 1;
 """
+
 
 STATS_QUERY = """
 SELECT all_months.kod, all_months.year_month,

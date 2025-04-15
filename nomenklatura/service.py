@@ -16,6 +16,16 @@ def get_nomenklatura_full(kod: str):
         data = dict(row._mapping)
         data["pometkaudalenija"] = data["pometkaudalenija"] == "Да"
 
+        # Преобразование логических полей из accessdata
+        for field in [
+            "ne_ispolzuetsya_v_zakaze",
+            "nelikvid",
+            "zafiksirovat_minimalki",
+            "list_ozhidaniya",
+        ]:
+            if field in data:
+                data[field] = bool(data[field])
+
         # Статистика за 36 месяцев
         months = generate_last_months()
         stat_result = conn.execute(
