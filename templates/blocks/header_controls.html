@@ -1,0 +1,38 @@
+<form action="/nomenklatura/search" method="get" class="row g-2 align-items-center mb-2">
+    <div class="col-auto">
+        <input type="text" name="kod" class="form-control form-control-sm" placeholder="Поиск по коду">
+    </div>
+    <div class="col-auto">
+        <input type="text" name="artikul" class="form-control form-control-sm" placeholder="Поиск по артикулу">
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
+    </div>
+    <div class="col-auto">
+        <a href="/nomenklatura/{{ data.kod }}/prev" class="btn btn-sm btn-outline-secondary"><i
+                class="bi bi-arrow-left"></i></a>
+        <a href="/nomenklatura/{{ data.kod }}/next" class="btn btn-sm btn-outline-secondary"><i
+                class="bi bi-arrow-right"></i></a>
+        <a href="/nomenklatura/{{ data.kod }}/view" class="btn btn-sm btn-outline-success"><i
+                class="bi bi-arrow-clockwise"></i></a>
+    </div>
+</form>
+
+<div class="mb-2 d-flex flex-wrap">
+    {% for flag, label in [
+    ('ne_ispolzuetsya_v_zakaze', 'НЕ ИСПОЛЬЗУЕТСЯ В ЗАКАЗЕ'),
+    ('nelikvid', 'НЕЛИКВИД'),
+    ('list_ozhidaniya', 'ОЖИДАНИЕ'),
+    ('zafiksirovat_minimalki', 'ЗАФИКСИРОВАТЬ'),
+    ('pometkaudalenija', 'УДАЛЕН')
+    ] %}
+    {% if flag != 'pometkaudalenija' %}
+    <form method="post" action="/nomenklatura/{{ data.kod }}/toggle/{{ flag }}">
+        <button class="state-button {{ 'state-true' if data[flag] else 'state-false' }}" type="submit">{{ label
+            }}</button>
+    </form>
+    {% else %}
+    <div class="state-button {{ 'state-true' if data[flag] else 'state-false' }}">{{ label }}</div>
+    {% endif %}
+    {% endfor %}
+</div>

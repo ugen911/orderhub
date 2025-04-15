@@ -26,58 +26,33 @@
         background-color: #6c757d;
     }
 
-    .minibox {
+    .info-card {
         background: white;
         border: 1px solid #dee2e6;
         border-radius: 6px;
         padding: 1rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        height: 100%;
         font-size: 13.5px;
+        height: 100%;
     }
 
-    .section-title {
-        margin-top: 1.75rem;
-        font-weight: 600;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .section-title i {
-        color: #0d6efd;
-    }
-
-    .compact-table th,
-    .compact-table td {
-        font-size: 12px;
-        padding: 4px 8px;
-        white-space: nowrap;
-    }
-
-    .analog-carousel {
-        display: flex;
-        overflow-x: auto;
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 1rem;
-        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
     }
 
-    .analog-card {
-        flex: 0 0 auto;
-        width: 270px;
-        padding: 0.8rem;
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        font-size: 13px;
+    .info-card strong {
+        display: inline-block;
+        min-width: 90px;
+        color: #555;
     }
 
-    .analog-card h6 {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
+    .info-highlight {
+        font-weight: bold;
+        color: #0d6efd;
+        font-size: 15px;
     }
 
     .sticky-header {
@@ -91,101 +66,57 @@
 
 <div class="container-fluid p-3">
     <div class="sticky-header">
-        <form action="/nomenklatura/search" method="get" class="row g-2 align-items-center mb-2">
-            <div class="col-auto">
-                <input type="text" name="kod" class="form-control form-control-sm" placeholder="Поиск по коду">
-            </div>
-            <div class="col-auto">
-                <input type="text" name="artikul" class="form-control form-control-sm" placeholder="Поиск по артикулу">
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
-            </div>
-            <div class="col-auto">
-                <a href="/nomenklatura/{{ data.kod }}/prev" class="btn btn-sm btn-outline-secondary"><i
-                        class="bi bi-arrow-left"></i></a>
-                <a href="/nomenklatura/{{ data.kod }}/next" class="btn btn-sm btn-outline-secondary"><i
-                        class="bi bi-arrow-right"></i></a>
-                <a href="/nomenklatura/{{ data.kod }}/view" class="btn btn-sm btn-outline-success"><i
-                        class="bi bi-arrow-clockwise"></i></a>
-            </div>
-        </form>
-
-        <div class="mb-2 d-flex flex-wrap">
-            {% for flag, label in [
-            ('ne_ispolzuetsya_v_zakaze', 'НЕ ИСПОЛЬЗУЕТСЯ В ЗАКАЗЕ'),
-            ('nelikvid', 'НЕЛИКВИД'),
-            ('list_ozhidaniya', 'ОЖИДАНИЕ'),
-            ('zafiksirovat_minimalki', 'ЗАФИКСИРОВАТЬ'),
-            ('pometkaudalenija', 'УДАЛЕН')
-            ] %}
-            {% if flag != 'pometkaudalenija' %}
-            <form method="post" action="/nomenklatura/{{ data.kod }}/toggle/{{ flag }}">
-                <button class="state-button {{ 'state-true' if data[flag] else 'state-false' }}" type="submit">{{ label
-                    }}</button>
-            </form>
-            {% else %}
-            <div class="state-button {{ 'state-true' if data[flag] else 'state-false' }}">{{ label }}</div>
-            {% endif %}
-            {% endfor %}
-        </div>
+        {% include "blocks/header_controls.html" %}
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
-        <div class="col">
-            <div class="minibox">
-                <div class="fw-bold mb-1">Код: {{ data.kod }}</div>
-                <div><strong>Арт.:</strong> {{ data.artikul }}</div>
-                <div><strong>Произв.:</strong> {{ data.proizvoditel }}</div>
-                <div><strong>Тип:</strong> {{ data.type_detail }}</div>
-                <div><strong>Наим.:</strong> {{ data.naimenovanie }}</div>
-            </div>
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-highlight">Код: {{ data.kod }}</div>
+            <div><strong>Арт.:</strong> {{ data.artikul }}</div>
+            <div><strong>Произв.:</strong> {{ data.proizvoditel }}</div>
+            <div><strong>Тип:</strong> {{ data.type_detail }}</div>
+            <div><strong>Наим.:</strong> {{ data.naimenovanie }}</div>
         </div>
-        <div class="col">
-            <div class="minibox">
-                <div class="fw-bold mb-1">Цена</div>
-                <div>Розн: {{ data.tsenarozn|float|round|int }}₽</div>
-                <div>Закуп: {{ data.tsenazakup|float|round|int }}₽</div>
-                <div>Ср: {{ data.middleprice|float|round|int }}₽</div>
-                <div>Макс: {{ data.maxprice|float|round|int }}₽</div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="minibox">
-                <div class="fw-bold mb-1">Остатки</div>
-                <div>Склад: {{ data.osnsklad|float|round|int }} {{ data.edizm }}</div>
-                <div>Заказы: {{ data.zakazy_sklad|float|round|int }}</div>
-                <div>Стеллаж: {{ data.stellazh }}</div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="minibox">
-                <div class="fw-bold mb-1">Поставщик</div>
-                <div>{{ data.delivery_sklad }}</div>
-                <div>Ост: {{ data.delivery_stock|float|round|int }}</div>
-                <div>Цена: {{ data.delivery_price|float|round|int }}₽</div>
-            </div>
-        </div>
-    </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 mt-1">
-        <div class="col">
-            <div class="minibox">
-                <label for="minimal">Мин. остаток</label>
+        <div class="info-card">
+            <div class="info-highlight">Цена</div>
+            <div><strong>Розн:</strong> {{ data.tsenarozn|float|round|int }}₽</div>
+            <div><strong>Закуп:</strong> {{ data.tsenazakup|float|round|int }}₽</div>
+            <div><strong>Ср.:</strong> {{ data.middleprice|float|round|int }}₽</div>
+            <div><strong>Макс:</strong> {{ data.maxprice|float|round|int }}₽</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-highlight">Остатки</div>
+            <div><strong>Склад:</strong> {{ data.osnsklad|float|round|int }} {{ data.edizm }}</div>
+            <div><strong>Заказы:</strong> {{ data.zakazy_sklad|float|round|int }}</div>
+            <div><strong>Стеллаж:</strong> {{ data.stellazh }}</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-highlight">Поставщик</div>
+            <div><strong>{{ data.delivery_sklad }}</strong></div>
+            <div><strong>Ост:</strong> {{ data.delivery_stock|float|round|int }}</div>
+            <div><strong>Цена:</strong> {{ data.delivery_price|float|round|int }}₽</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-highlight">Мин. остаток</div>
+            <div class="mb-2">
+                <label for="minimal">Мин.:</label>
                 <input type="number" step="1" name="minimal" id="minimal"
                     class="form-control form-control-sm autosave-field" data-kod="{{ data.kod }}"
                     value="{{ data.minimal|float|round|int }}">
-                <div class="mt-1">Расчетный: {{ data.minimal_raschet|float|round|int }}</div>
             </div>
+            <div><strong>Расчетный:</strong> {{ data.minimal_raschet|float|round|int }}</div>
         </div>
-        <div class="col">
-            <div class="minibox">
-                <div class="fw-bold mb-1">ABC / XYZ</div>
-                <div>ABC: {{ data.abc }}</div>
-                <div>XYZ: {{ data.xyz }}</div>
-                <div>Год: {{ data.total_sales_last_12_months|float|round|int }}</div>
-                <div>3 мес: {{ data.total_sales_last_3_months|float|round|int }}</div>
-            </div>
+
+        <div class="info-card">
+            <div class="info-highlight">ABC / XYZ</div>
+            <div><strong>ABC:</strong> {{ data.abc }}</div>
+            <div><strong>XYZ:</strong> {{ data.xyz }}</div>
+            <div><strong>Год:</strong> {{ data.total_sales_last_12_months|float|round|int }}</div>
+            <div><strong>3 мес:</strong> {{ data.total_sales_last_3_months|float|round|int }}</div>
         </div>
     </div>
 
@@ -211,7 +142,7 @@
     </div>
 
     <h6 class="section-title"><i class="bi bi-receipt"></i> История заказов</h6>
-    <div class="table-responsive" style="max-height: 360px; overflow-y: auto;">
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
         {% include "blocks/orders.html" %}
     </div>
 </div>
