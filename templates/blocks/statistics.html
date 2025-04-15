@@ -1,0 +1,50 @@
+<div class="table-responsive">
+    <table class="table table-sm table-bordered text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Месяц</th>
+                {% for month in data.monthly_stats.keys() %}
+                <th>{{ month }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Продажи</strong></td>
+                {% for s in data.monthly_stats.values() %}
+                <td>{{ s.sales|float|round|int }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><strong>Сумма продаж</strong></td>
+                {% for s in data.monthly_stats.values() %}
+                <td>{{ s.salesum|float|round|int }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><strong>Остаток</strong></td>
+                {% for s in data.monthly_stats.values() %}
+                <td>{{ s.stock|float|round|int }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><strong>Цена</strong></td>
+                {% for s in data.monthly_stats.values() %}
+                <td>{{ s.tsena|float|round|int if s.tsena is not none else '' }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><strong>Поставки</strong></td>
+                {% for s in data.monthly_stats.values() %}
+                <td>{{ s.sup|float|round|int }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><strong>Сумма поставок</strong></td>
+                {% for s in data.monthly_stats.values() %}
+                <td>{{ s.supsum|float|round|int }}</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>

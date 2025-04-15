@@ -1,0 +1,19 @@
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+    {% for analog in data.analogs | sort(attribute='osnsklad', reverse=True) %}
+    <div class="col">
+        <div class="card analog-card h-100">
+            <div class="card-body">
+                <h6>{{ analog.naimenovanie }}</h6>
+                <p>
+                    Код: {{ analog.kod }}<br>
+                    Артикул: {{ analog.artikul }}<br>
+                    Остаток: {{ analog.osnsklad|float|round|int }}<br>
+                    Продажи за год: {{ analog.total_sales_last_12_months|float|round|int }}<br>
+                    Розница: {{ analog.tsenarozn|float|round|int }}
+                </p>
+                <a href="/nomenklatura/{{ analog.kod }}/view" class="btn btn-sm btn-outline-primary">Перейти</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

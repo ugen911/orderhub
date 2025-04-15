@@ -69,3 +69,37 @@ def get_nomenklatura_full(kod: str):
         data["analogs"] = analogs
 
         return data
+
+
+def get_prev_next_kod(kod: str, direction="next"):
+    engine = get_db_engine()
+    with engine.connect() as conn:
+        order = "ASC" if direction == "next" else "DESC"
+        result = conn.execute(
+            text(
+                f"""
+            SELECT kod FROM nomenklaturaold
+            WHERE TRIM(kod) {( '>' if direction == "next" else '<')} :kod
+            ORDER BY kod {order}
+            LIMIT 1
+        """
+            ),
+            {"kod": kod.strip()},
+        ).fetchone()
+        return result[0] if result else kod
+
+
+def search_kod_by_artikul(artikul: str):
+    engine = get_db_engine()
+    with engine.connect() as conn:
+        result = conn.execute(
+            text(
+                """
+            SELECT kod FROM nomenklaturaold
+            WHERE TRIM(artikul) = :art
+            LIMIT 1
+        """
+            ),
+            {"art": artikul.strip()},
+        ).fetchone()
+        return result[0] if result else None
