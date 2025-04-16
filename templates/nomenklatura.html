@@ -18,6 +18,7 @@
         margin: 2px 5px 2px 0;
         font-size: 12px;
         transition: background-color 0.3s ease;
+        cursor: pointer;
     }
 
     .state-true {
@@ -28,7 +29,7 @@
         background-color: #6c757d;
     }
 
-    /* Блок информации – карточки */
+    /* Карточки информации */
     .info-card {
         background: #fff;
         border: 1px solid #dee2e6;
@@ -36,6 +37,11 @@
         padding: 1rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
         font-size: 14px;
+        transition: transform 0.2s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-3px);
     }
 
     .info-grid {
@@ -94,6 +100,11 @@
         padding: 0.75rem;
         width: calc(33.333% - 1rem);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s ease;
+    }
+
+    .analog-card:hover {
+        transform: translateY(-3px);
     }
 
     @media (max-width: 768px) {
@@ -112,6 +123,22 @@
     .compact-table td,
     .compact-table th {
         padding: 0.5rem;
+    }
+
+    /* Фиксированная шапка таблицы заказов */
+    .orders-table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 1;
+    }
+
+    /* Toast уведомления */
+    .toast-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1080;
     }
 </style>
 
@@ -188,19 +215,31 @@
             <div><strong>Ост:</strong> {{ analog.osnsklad|float|round|int }}</div>
             <div><strong>Год:</strong> {{ analog.total_sales_last_12_months|float|round|int }}</div>
             <div><strong>Розн:</strong> {{ analog.tsenarozn|float|round|int }}</div>
-            <a href="/nomenklatura/{{ analog.kod }}/view" class="btn btn-sm btn-outline-primary mt-2">Перейти</a>
+            <a href="/nomenklatura/{{ analog.kod }}/view" class="btn btn-sm btn-outline-primary mt-2"
+                data-bs-toggle="tooltip" data-bs-placement="top" title="Перейти на карточку">Перейти</a>
         </div>
         {% endfor %}
     </div>
 
     <h6 class="section-title"><i class="bi bi-receipt"></i> История заказов</h6>
     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-        {% include "blocks/orders.html" %}
+        <table class="table table-bordered table-sm compact-table orders-table">
+            {% include "blocks/orders.html" %}
+        </table>
     </div>
 </div>
 
+<!-- Контейнер для toast уведомлений -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Инициализация подсказок (tooltips)
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
         const fields = document.querySelectorAll(".autosave-field");
         fields.forEach(field => {
             field.addEventListener("blur", () => {
@@ -213,9 +252,31 @@
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
                     body: `field=${encodeURIComponent(name)}&value=${encodeURIComponent(value)}`
-                });
+                }).then(response => {
+                    if (response.ok) {
+                        showToast("Изменения сохранены", "success");
+                    } else {
+                        showToast("Ошибка сохранения", "danger");
+                    }
+                }).catch(() => showToast("Ошибка связи", "danger"));
             });
         });
+
+        function showToast(message, type) {
+            const toastId = 'toast' + Date.now();
+            const toastHTML = `
+            <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+                </div>
+            </div>`;
+            const container = document.getElementById("toastContainer");
+            container.insertAdjacentHTML('beforeend', toastHTML);
+            const toastEl = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            toast.show();
+        }
     });
 </script>
 {% endblock %}
