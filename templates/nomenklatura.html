@@ -1,52 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
 <style>
     body {
         font-size: 14px;
-        background-color: #f0f2f5;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
     }
 
-    /* Кнопки состояний */
     .state-button {
-        padding: 5px 12px;
+        padding: 5px 10px;
         border: none;
         border-radius: 4px;
         font-weight: 600;
-        color: #fff;
+        color: white;
         margin: 2px 5px 2px 0;
         font-size: 12px;
-        transition: background-color 0.3s ease;
-        cursor: pointer;
     }
 
     .state-true {
-        background-color: #e74c3c;
+        background-color: #dc3545;
     }
 
     .state-false {
         background-color: #6c757d;
     }
 
-    /* Карточки информации */
     .info-card {
-        background: #fff;
+        background: white;
         border: 1px solid #dee2e6;
-        border-radius: 8px;
+        border-radius: 6px;
         padding: 1rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        font-size: 14px;
-        transition: transform 0.2s ease;
-    }
-
-    .info-card:hover {
-        transform: translateY(-3px);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        font-size: 13.5px;
+        height: 100%;
     }
 
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 1rem;
         margin-bottom: 2rem;
     }
@@ -54,91 +46,36 @@
     .info-card strong {
         display: inline-block;
         min-width: 90px;
-        color: #333;
+        color: #555;
     }
 
     .info-highlight {
         font-weight: bold;
-        color: #007bff;
+        color: #0d6efd;
         font-size: 15px;
-        margin-bottom: 0.5rem;
     }
 
-    /* Стили для фиксированной панели */
     .sticky-header {
         position: sticky;
         top: 0;
         z-index: 1020;
-        background-color: #fff;
-        padding: 10px 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
+        background-color: white;
+        padding-top: 1rem;
     }
 
-    /* Заголовки секций */
-    .section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        border-bottom: 2px solid #dee2e6;
-        padding-bottom: 5px;
-        color: #343a40;
-    }
-
-    /* Аналоги – адаптивная карточка */
-    .analog-carousel {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
+    .form-control-sm.adaptive-input {
+        max-width: 100%;
     }
 
     .analog-card {
-        background: #fff;
+        max-width: 300px;
+        background-color: #fff;
         border: 1px solid #dee2e6;
-        border-radius: 8px;
+        border-radius: 6px;
         padding: 0.75rem;
-        width: calc(33.333% - 1rem);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        transition: transform 0.2s ease;
-    }
-
-    .analog-card:hover {
-        transform: translateY(-3px);
-    }
-
-    @media (max-width: 768px) {
-        .analog-card {
-            width: calc(50% - 1rem);
-        }
-    }
-
-    @media (max-width: 576px) {
-        .analog-card {
-            width: 100%;
-        }
-    }
-
-    /* Компактное оформление таблицы заказов */
-    .compact-table td,
-    .compact-table th {
-        padding: 0.5rem;
-    }
-
-    /* Фиксированная шапка таблицы заказов */
-    .orders-table thead th {
-        position: sticky;
-        top: 0;
-        background-color: #f8f9fa;
-        z-index: 1;
-    }
-
-    /* Toast уведомления */
-    .toast-container {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        z-index: 1080;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        margin: 0 auto;
+        text-align: left;
     }
 </style>
 
@@ -148,53 +85,141 @@
     </div>
 
     <div class="info-grid">
-        <div class="info-card">
-            <div class="info-highlight">Код: {{ data.kod }}</div>
-            <div><strong>Арт.:</strong> {{ data.artikul }}</div>
-            <div><strong>Произв.:</strong> {{ data.proizvoditel }}</div>
-            <div><strong>Тип:</strong> {{ data.type_detail }}</div>
-            <div><strong>Наим.:</strong> {{ data.naimenovanie }}</div>
-        </div>
-
-        <div class="info-card">
-            <div class="info-highlight">Цена</div>
-            <div><strong>Розн:</strong> {{ data.tsenarozn|float|round|int }}₽</div>
-            <div><strong>Закуп:</strong> {{ data.tsenazakup|float|round|int }}₽</div>
-            <div><strong>Ср.:</strong> {{ data.middleprice|float|round|int }}₽</div>
-            <div><strong>Макс:</strong> {{ data.maxprice|float|round|int }}₽</div>
-        </div>
-
-        <div class="info-card">
-            <div class="info-highlight">Остатки</div>
-            <div><strong>Склад:</strong> {{ data.osnsklad|float|round|int }} {{ data.edizm }}</div>
-            <div><strong>Заказы:</strong> {{ data.zakazy_sklad|float|round|int }}</div>
-            <div><strong>Стеллаж:</strong> {{ data.stellazh }}</div>
-        </div>
-
-        <div class="info-card">
-            <div class="info-highlight">Поставщик</div>
-            <div><strong>{{ data.delivery_sklad }}</strong></div>
-            <div><strong>Ост:</strong> {{ data.delivery_stock|float|round|int }}</div>
-            <div><strong>Цена:</strong> {{ data.delivery_price|float|round|int }}₽</div>
-        </div>
-
-        <div class="info-card">
-            <div class="info-highlight">Мин. остаток</div>
-            <div class="mb-2">
-                <label for="minimal">Мин.:</label>
-                <input type="number" step="1" name="minimal" id="minimal"
-                    class="form-control form-control-sm autosave-field" data-kod="{{ data.kod }}"
-                    value="{{ data.minimal|float|round|int }}">
+        <!-- Инфо -->
+        <div class="info-card" style="grid-column: span 2;">
+            <div class="info-highlight mb-2">Код: {{ data.kod if data.kod else 'неизвестно' }}</div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Артикул:</strong>
+                <span>{{ data.artikul if data.artikul else 'неизвестно' }}</span>
             </div>
-            <div><strong>Расчетный:</strong> {{ data.minimal_raschet|float|round|int }}</div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Производитель:</strong>
+                <span>{{ data.proizvoditel if data.proizvoditel else 'неизвестно' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <strong>Тип детали:</strong>
+                <span>{{ data.type_detail if data.type_detail else 'неизвестно' }}</span>
+            </div>
+            <div>{{ data.naimenovanie }}</div>
         </div>
 
+
+
+        <!-- Цены -->
         <div class="info-card">
-            <div class="info-highlight">ABC / XYZ</div>
-            <div><strong>ABC:</strong> {{ data.abc }}</div>
-            <div><strong>XYZ:</strong> {{ data.xyz }}</div>
-            <div><strong>Год:</strong> {{ data.total_sales_last_12_months|float|round|int }}</div>
-            <div><strong>3 мес:</strong> {{ data.total_sales_last_3_months|float|round|int }}</div>
+            <div class="mb-2"><strong class="info-highlight">Цены</strong></div>
+            <div class="d-flex justify-content-between"><span><strong>Розничная:</strong></span><span>{{
+                    data.tsenarozn|float|round|int }}₽</span></div>
+            <div class="d-flex justify-content-between"><span><strong>Закупочная:</strong></span><span>{{
+                    data.tsenazakup|float|round|int }}₽</span></div>
+            <div class="d-flex justify-content-between"><span><strong>Средняя на остатках:</strong></span><span>{{
+                    data.middleprice|float|round|int }}₽</span></div>
+            <div class="d-flex justify-content-between"><span><strong>Максимальная на остатках:</strong></span><span>{{
+                    data.maxprice|float|round|int }}₽</span></div>
+        </div>
+
+        <!-- Остатки -->
+        <div class="info-card">
+            <div class="mb-2"><strong class="info-highlight">Остатки</strong></div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Основной:</strong>
+                <span>{{ data.osnsklad|float|round|int }} {{ data.edizm }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Заказы:</strong>
+                <span>{{ data.zakazy_sklad|float|round|int }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <strong>Стеллаж:</strong>
+                <span>{{ data.stellazh }}</span>
+            </div>
+        </div>
+
+
+        <!-- Мин. остаток -->
+        <div class="info-card">
+            <label for="minimal">Минималка:</label>
+            <input type="number" step="1" name="minimal" id="minimal" class="form-control form-control-sm autosave-field"
+                style="max-width: 70px" data-kod="{{ data.kod }}" value="{{ data.minimal|float|round|int }}">
+            <div class="mt-2"><strong>Расчетные значения:</strong> {{ data.minimal_raschet|float|round|int }}</div>
+        </div>
+
+
+        <!-- Поставщик -->
+        <div class="info-card">
+            <div class="mb-2"><strong class="info-highlight">Поставщик с минимальной ценой</strong></div>
+            <div class="mb-2 text-uppercase">
+                <strong>{{ data.delivery_sklad if data.delivery_sklad else 'не проценилось' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Остаток:</strong>
+                <span>{{ data.delivery_stock if data.delivery_stock is not none else 'не проценилось' }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <strong>Цена:</strong>
+                <span>
+                    {{ (data.delivery_price|float|round|int ~ '₽') if data.delivery_price is not none else 'не проценилось' }}
+                </span>
+            </div>
+        </div>
+
+
+        <!-- Аналитика -->
+        <div class="info-card">
+            <div class="mb-2"><strong class="info-highlight">Аналитика</strong></div>
+            <div class="d-flex justify-content-between"><span><strong>ABC:</strong></span><span>{{ data.abc if data.abc else ''
+                    }}</span></div>
+            <div class="d-flex justify-content-between"><span><strong>XYZ:</strong></span><span>{{ data.xyz if data.xyz else ''
+                    }}</span></div>
+            <div class="d-flex justify-content-between"><span><strong>За Год:</strong></span><span>{{
+                    data.total_sales_last_12_months|float|round|int }}</span></div>
+            <div class="d-flex justify-content-between"><span><strong>За посл. 3 мес:</strong></span><span>{{
+                    data.total_sales_last_3_months|float|round|int }}</span></div>
+        </div>
+
+
+        <!-- Аналоги -->
+        <div class="info-card" style="grid-column: span 2;">
+            {% if data.analogs %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong class="info-highlight">Аналоги</strong>
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="prev-analog"><i
+                            class="bi bi-chevron-left"></i></button>
+                    <span id="analog-index">1 из {{ data.analogs|length }}</span>
+                    <button class="btn btn-sm btn-outline-secondary ms-2" id="next-analog"><i
+                            class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+            <div id="analog-container">
+                {% for analog in data.analogs | sort(attribute='osnsklad', reverse=True) %}
+                <div class="analog-card d-none">
+                    <div class="d-flex justify-content-between mb-1">
+                        <strong>Производитель:</strong><span>{{ analog.proizvoditel }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <strong>Код:</strong><span>{{ analog.kod }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <strong>Артикул:</strong><span>{{ analog.artikul }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <strong>Ост:</strong><span>{{ analog.osnsklad|float|round|int }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <strong>Год:</strong><span>{{ analog.total_sales_last_12_months|float|round|int }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Розн:</strong><span>{{ analog.tsenarozn|float|round|int }}₽</span>
+                    </div>
+                    <a href="/nomenklatura/{{ analog.kod }}/view" class="btn btn-sm btn-outline-primary w-100">Перейти</a>
+                </div>
+
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>Нет аналогов</p>
+            {% endif %}
         </div>
     </div>
 
@@ -205,41 +230,14 @@
         </table>
     </div>
 
-    <h6 class="section-title"><i class="bi bi-layers"></i> Аналоги</h6>
-    <div class="analog-carousel">
-        {% for analog in data.analogs | sort(attribute='osnsklad', reverse=true) %}
-        <div class="analog-card">
-            <h6>{{ analog.naimenovanie }}</h6>
-            <div><strong>Код:</strong> {{ analog.kod }}</div>
-            <div><strong>Арт.:</strong> {{ analog.artikul }}</div>
-            <div><strong>Ост:</strong> {{ analog.osnsklad|float|round|int }}</div>
-            <div><strong>Год:</strong> {{ analog.total_sales_last_12_months|float|round|int }}</div>
-            <div><strong>Розн:</strong> {{ analog.tsenarozn|float|round|int }}</div>
-            <a href="/nomenklatura/{{ analog.kod }}/view" class="btn btn-sm btn-outline-primary mt-2"
-                data-bs-toggle="tooltip" data-bs-placement="top" title="Перейти на карточку">Перейти</a>
-        </div>
-        {% endfor %}
-    </div>
-
     <h6 class="section-title"><i class="bi bi-receipt"></i> История заказов</h6>
     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-        <table class="table table-bordered table-sm compact-table orders-table">
-            {% include "blocks/orders.html" %}
-        </table>
+        {% include "blocks/orders.html" %}
     </div>
 </div>
 
-<!-- Контейнер для toast уведомлений -->
-<div class="toast-container" id="toastContainer"></div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Инициализация подсказок (tooltips)
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl)
-        });
-
         const fields = document.querySelectorAll(".autosave-field");
         fields.forEach(field => {
             field.addEventListener("blur", () => {
@@ -252,30 +250,37 @@
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
                     body: `field=${encodeURIComponent(name)}&value=${encodeURIComponent(value)}`
-                }).then(response => {
-                    if (response.ok) {
-                        showToast("Изменения сохранены", "success");
-                    } else {
-                        showToast("Ошибка сохранения", "danger");
-                    }
-                }).catch(() => showToast("Ошибка связи", "danger"));
+                });
             });
         });
 
-        function showToast(message, type) {
-            const toastId = 'toast' + Date.now();
-            const toastHTML = `
-            <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">${message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрыть"></button>
-                </div>
-            </div>`;
-            const container = document.getElementById("toastContainer");
-            container.insertAdjacentHTML('beforeend', toastHTML);
-            const toastEl = document.getElementById(toastId);
-            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-            toast.show();
+        // Пагинация аналогов
+        const analogCards = document.querySelectorAll("#analog-container .analog-card");
+        const indexSpan = document.getElementById("analog-index");
+        const prevBtn = document.getElementById("prev-analog");
+        const nextBtn = document.getElementById("next-analog");
+
+        let currentIndex = 0;
+
+        function showAnalog(index) {
+            analogCards.forEach((card, i) => {
+                card.classList.toggle("d-none", i !== index);
+            });
+            indexSpan.textContent = `${index + 1} из ${analogCards.length}`;
+        }
+
+        if (analogCards.length > 0) {
+            showAnalog(currentIndex);
+
+            prevBtn.addEventListener("click", () => {
+                currentIndex = (currentIndex - 1 + analogCards.length) % analogCards.length;
+                showAnalog(currentIndex);
+            });
+
+            nextBtn.addEventListener("click", () => {
+                currentIndex = (currentIndex + 1) % analogCards.length;
+                showAnalog(currentIndex);
+            });
         }
     });
 </script>
