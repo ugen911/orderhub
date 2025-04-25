@@ -1,12 +1,13 @@
-<form action="/nomenklatura/search" method="get" class="row g-2 align-items-center mb-2">
+<form id="search-form" class="row g-2 align-items-center mb-2">
     <div class="col-auto">
-        <input type="text" name="kod" class="form-control form-control-sm" placeholder="Поиск по коду">
+        <input type="text" name="kod" id="kod-input" class="form-control form-control-sm" placeholder="Поиск по коду">
     </div>
     <div class="col-auto">
-        <input type="text" name="artikul" class="form-control form-control-sm" placeholder="Поиск по артикулу">
+        <input type="text" name="artikul" id="artikul-input" class="form-control form-control-sm"
+            placeholder="Поиск по артикулу">
     </div>
     <div class="col-auto">
-        <button class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
+        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
     </div>
     <div class="col-auto">
         <a href="/nomenklatura/{{ data.kod }}/prev" class="btn btn-sm btn-outline-secondary"><i
@@ -18,7 +19,7 @@
     </div>
 </form>
 
-<div class="mb-2 d-flex flex-wrap">
+<div class="mb-2 d-flex flex-wrap" id="flag-buttons">
     {% for flag, label in [
     ('ne_ispolzuetsya_v_zakaze', 'НЕ ИСПОЛЬЗУЕТСЯ В ЗАКАЗЕ'),
     ('nelikvid', 'НЕЛИКВИД'),
@@ -27,12 +28,70 @@
     ('pometkaudalenija', 'УДАЛЕН')
     ] %}
     {% if flag != 'pometkaudalenija' %}
-    <form method="post" action="/nomenklatura/{{ data.kod }}/toggle/{{ flag }}">
-        <button class="state-button {{ 'state-true' if data[flag] else 'state-false' }}" type="submit">{{ label
-            }}</button>
-    </form>
+    <button type="button" class="state-button {{ 'state-true' if data[flag] else 'state-false' }}"
+        data-flag="{{ flag }}" data-kod="{{ data.kod }}">
+        {{ label }}
+    </button>
     {% else %}
     <div class="state-button {{ 'state-true' if data[flag] else 'state-false' }}">{{ label }}</div>
     {% endif %}
     {% endfor %}
 </div>
+
+<script>
+    // JS: переключение флагов
+    document.querySelectorAll("#flag-buttons .state-button").forEach(btn => {
+        const flag = btn.dataset.flag;
+        if (!flag) return; // "Удален" не кликается
+
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const kod = btn.dataset.kod;
+
+            try {
+                const response = await fetch(`/nomenklatura/${kod}/toggle/${flag}`, {
+                    method: "POST"
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const newVal = result.new_value;
+                    btn.classList.toggle("state-true", newVal);
+                    btn.classList.toggle("state-false", !newVal);
+                } else {
+                    const err = await response.json();
+                    alert(`Ошибка ${response.status}: ${err.error || "Не удалось переключить флаг"}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Сетевая ошибка при переключении флага");
+            }
+        });
+    });
+
+    // JS: поиск
+    document.getElementById("search-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const kod = document.getElementById("kod-input").value.trim();
+        const artikul = document.getElementById("artikul-input").value.trim();
+
+        if (!kod && !artikul) return;
+
+        try {
+            const response = await fetch(`/nomenklatura/search?kod=${encodeURIComponent(kod)}&artikul=${encodeURIComponent(artikul)}`, {
+                method: "GET",
+                redirect: "manual"
+            });
+
+            if (response.status === 303 || response.status === 302) {
+                const location = response.headers.get("Location");
+                window.location.href = location;
+            } else {
+                alert("Товар не найден.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Ошибка при поиске.");
+        }
+    });
+</script>

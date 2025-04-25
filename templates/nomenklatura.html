@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/rows.html" import row %}
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -43,12 +44,6 @@
         margin-bottom: 2rem;
     }
 
-    .info-card strong {
-        display: inline-block;
-        min-width: 90px;
-        color: #555;
-    }
-
     .info-highlight {
         font-weight: bold;
         color: #0d6efd;
@@ -61,10 +56,6 @@
         z-index: 1020;
         background-color: white;
         padding-top: 1rem;
-    }
-
-    .form-control-sm.adaptive-input {
-        max-width: 100%;
     }
 
     .analog-card {
@@ -87,50 +78,28 @@
     <div class="info-grid">
         <!-- Инфо -->
         <div class="info-card" style="grid-column: span 2;">
-            <div class="info-highlight mb-2">Код: {{ data.kod if data.kod else 'неизвестно' }}</div>
-            <div class="d-flex justify-content-between mb-1">
-                <strong>Артикул:</strong>
-                <span>{{ data.artikul if data.artikul else 'неизвестно' }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-                <strong>Производитель:</strong>
-                <span>{{ data.proizvoditel if data.proizvoditel else 'неизвестно' }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-                <strong>Тип детали:</strong>
-                <span>{{ data.type_detail if data.type_detail else 'неизвестно' }}</span>
-            </div>
+            <div class="info-highlight mb-2">Код: {{ data.kod | default('неизвестно') }}</div>
+            {{ row("Артикул", data.artikul | default('неизвестно')) }}
+            {{ row("Производитель", data.proizvoditel | default('неизвестно')) }}
+            {{ row("Тип детали", data.type_detail | default('неизвестно')) }}
             <div>{{ data.naimenovanie }}</div>
         </div>
 
         <!-- Цены -->
         <div class="info-card">
             <div class="mb-2"><strong class="info-highlight">Цены</strong></div>
-            <div class="d-flex justify-content-between"><span><strong>Розничная:</strong></span><span>{{
-                    data.tsenarozn|float|round|int }}₽</span></div>
-            <div class="d-flex justify-content-between"><span><strong>Закупочная:</strong></span><span>{{
-                    data.tsenazakup|float|round|int }}₽</span></div>
-            <div class="d-flex justify-content-between"><span><strong>Средняя на остатках:</strong></span><span>{{
-                    data.middleprice|float|round|int }}₽</span></div>
-            <div class="d-flex justify-content-between"><span><strong>Максимальная на остатках:</strong></span><span>{{
-                    data.maxprice|float|round|int }}₽</span></div>
+            {{ row("Розничная", data.tsenarozn|float|round|int ~ "₽") }}
+            {{ row("Закупочная", data.tsenazakup|float|round|int ~ "₽") }}
+            {{ row("Средняя на остатках", data.middleprice|float|round|int ~ "₽") }}
+            {{ row("Максимальная", data.maxprice|float|round|int ~ "₽") }}
         </div>
 
         <!-- Остатки -->
         <div class="info-card">
             <div class="mb-2"><strong class="info-highlight">Остатки</strong></div>
-            <div class="d-flex justify-content-between mb-1">
-                <strong>Основной:</strong>
-                <span>{{ data.osnsklad|float|round|int }} {{ data.edizm }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-                <strong>Заказы:</strong>
-                <span>{{ data.zakazy_sklad|float|round|int }}</span>
-            </div>
-            <div class="d-flex justify-content-between">
-                <strong>Стеллаж:</strong>
-                <span>{{ data.stellazh }}</span>
-            </div>
+            {{ row("Основной", data.osnsklad|float|round|int ~ " " ~ data.edizm) }}
+            {{ row("Заказы", data.zakazy_sklad|float|round|int) }}
+            {{ row("Стеллаж", data.stellazh) }}
         </div>
 
         <!-- Мин. остаток -->
@@ -146,33 +115,23 @@
         <div class="info-card">
             <div class="mb-2"><strong class="info-highlight">Поставщик с минимальной ценой</strong></div>
             <div class="mb-2 text-uppercase">
-                <strong>{{ data.delivery_sklad if data.delivery_sklad else 'не проценилось' }}</strong>
+                <strong>{{ data.delivery_sklad | default('не проценилось') }}</strong>
             </div>
-            <div class="d-flex justify-content-between mb-1">
-                <strong>Остаток:</strong>
-                <span>{{ data.delivery_stock if data.delivery_stock is not none else 'не проценилось' }}</span>
-            </div>
-            <div class="d-flex justify-content-between">
-                <strong>Цена:</strong>
-                <span>{{ (data.delivery_price|float|round|int ~ '₽') if data.delivery_price is not none else 'не
-                    проценилось' }}</span>
-            </div>
+            {{ row("Остаток", data.delivery_stock if data.delivery_stock is not none else "не проценилось") }}
+            {{ row("Цена", (data.delivery_price|float|round|int ~ "₽") if data.delivery_price is not none else "не
+            проценилось") }}
         </div>
 
         <!-- Аналитика -->
         <div class="info-card">
             <div class="mb-2"><strong class="info-highlight">Аналитика</strong></div>
-            <div class="d-flex justify-content-between"><span><strong>ABC:</strong></span><span>{{ data.abc if data.abc
-                    else '' }}</span></div>
-            <div class="d-flex justify-content-between"><span><strong>XYZ:</strong></span><span>{{ data.xyz if data.xyz
-                    else '' }}</span></div>
-            <div class="d-flex justify-content-between"><span><strong>За Год:</strong></span><span>{{
-                    data.total_sales_last_12_months|float|round|int }}</span></div>
-            <div class="d-flex justify-content-between"><span><strong>За посл. 3 мес:</strong></span><span>{{
-                    data.total_sales_last_3_months|float|round|int }}</span></div>
+            {{ row("ABC", data.abc | default(''), True) }}
+            {{ row("XYZ", data.xyz | default(''), True) }}
+            {{ row("За Год", data.total_sales_last_12_months|float|round|int) }}
+            {{ row("За 3 мес", data.total_sales_last_3_months|float|round|int) }}
         </div>
 
-        <!-- Аналоги (через include) -->
+        <!-- Аналоги -->
         {% set analogs = data.analogs %}
         {% include "blocks/analogs.html" %}
     </div>
@@ -194,19 +153,26 @@
     document.addEventListener("DOMContentLoaded", function () {
         const fields = document.querySelectorAll(".autosave-field");
         fields.forEach(field => {
-            field.addEventListener("blur", () => {
-                const kod = field.dataset.kod;
-                const name = field.name;
-                const value = field.value;
-                fetch(`/nomenklatura/${kod}/update_field`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: `field=${encodeURIComponent(name)}&value=${encodeURIComponent(value)}`
-                });
+            field.addEventListener("blur", () => updateField(field));
+            field.addEventListener("keydown", e => {
+                if (e.key === "Enter") field.blur();
             });
         });
+
+        function updateField(field) {
+            const kod = field.dataset.kod;
+            const name = field.name;
+            const value = field.value;
+            fetch(`/nomenklatura/${kod}/update_field`, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `field=${encodeURIComponent(name)}&value=${encodeURIComponent(value)}`
+            });
+        }
+
+        // Bootstrap tooltips
+        const tooltipList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipList.map(el => new bootstrap.Tooltip(el));
     });
 </script>
 {% endblock %}

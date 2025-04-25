@@ -1,0 +1,6 @@
+{% macro row(label, value, muted=False) -%}
+<div class="d-flex justify-content-between mb-1">
+    <strong {% if muted %}class="text-muted" {% endif %}>{{ label }}:</strong>
+    <span>{{ value }}</span>
+</div>
+{%- endmacro %}
