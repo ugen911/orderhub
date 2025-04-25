@@ -1,19 +1,73 @@
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-    {% for analog in data.analogs | sort(attribute='osnsklad', reverse=True) %}
-    <div class="col">
-        <div class="card analog-card h-100">
-            <div class="card-body">
-                <h6>{{ analog.naimenovanie }}</h6>
-                <p>
-                    Код: {{ analog.kod }}<br>
-                    Артикул: {{ analog.artikul }}<br>
-                    Остаток: {{ analog.osnsklad|float|round|int }}<br>
-                    Продажи за год: {{ analog.total_sales_last_12_months|float|round|int }}<br>
-                    Розница: {{ analog.tsenarozn|float|round|int }}
-                </p>
-                <a href="/nomenklatura/{{ analog.kod }}/view" class="btn btn-sm btn-outline-primary">Перейти</a>
-            </div>
+<div class="info-card w-100">
+    {% if analogs %}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong class="info-highlight">Аналоги</strong>
+        <div>
+            <button class="btn btn-sm btn-outline-secondary me-2" id="prev-analog"><i
+                    class="bi bi-chevron-left"></i></button>
+            <span id="analog-index">1 из {{ analogs|length }}</span>
+            <button class="btn btn-sm btn-outline-secondary ms-2" id="next-analog"><i
+                    class="bi bi-chevron-right"></i></button>
         </div>
     </div>
-    {% endfor %}
+    <div id="analog-container">
+        {% for analog in analogs | sort(attribute='osnsklad', reverse=True) %}
+        <div class="analog-card d-none">
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Производитель:</strong><span>{{ analog.proizvoditel }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Код:</strong><span>{{ analog.kod }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Артикул:</strong><span>{{ analog.artikul }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Ост:</strong><span>{{ analog.osnsklad|float|round|int }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <strong>Год:</strong><span>{{ analog.total_sales_last_12_months|float|round|int }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <strong>Розн:</strong><span>{{ analog.tsenarozn|float|round|int }}₽</span>
+            </div>
+            <a href="/nomenklatura/{{ analog.kod }}/view" class="btn btn-sm btn-outline-primary w-100">Перейти</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Нет аналогов</p>
+    {% endif %}
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const analogCards = document.querySelectorAll("#analog-container .analog-card");
+        const indexSpan = document.getElementById("analog-index");
+        const prevBtn = document.getElementById("prev-analog");
+        const nextBtn = document.getElementById("next-analog");
+
+        let currentIndex = 0;
+
+        function showAnalog(index) {
+            analogCards.forEach((card, i) => {
+                card.classList.toggle("d-none", i !== index);
+            });
+            indexSpan.textContent = `${index + 1} из ${analogCards.length}`;
+        }
+
+        if (analogCards.length > 0) {
+            showAnalog(currentIndex);
+
+            prevBtn.addEventListener("click", () => {
+                currentIndex = (currentIndex - 1 + analogCards.length) % analogCards.length;
+                showAnalog(currentIndex);
+            });
+
+            nextBtn.addEventListener("click", () => {
+                currentIndex = (currentIndex + 1) % analogCards.length;
+                showAnalog(currentIndex);
+            });
+        }
+    });
+</script>
